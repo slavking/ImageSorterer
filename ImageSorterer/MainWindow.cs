@@ -9,6 +9,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+
+/* 
+maded by cnsr on request of some german bernd
+doesn't even steal your data
+trust me
+(also doesn't really work)
+t. ukrainian bernd aka cnsr
+*/
+
 namespace ImageSorterer
 {
     public partial class MainWindow : Form
@@ -16,6 +25,8 @@ namespace ImageSorterer
         public MainWindow()
         {
             InitializeComponent();
+            Info.Text = ("Made by cnsr for KC.\nSomewhat works, maybe doesn't.\nI am not sure.\nVersion: " + version);
+            infoBox.Text = ("1. Select source folder. It must contain destination subfolders." + Environment.NewLine + "2. Select destination folder, click \"NEXT\" button." + Environment.NewLine + "3. That's all.");
         }
 
         private Dictionary<string, string> movingDict = new Dictionary<string, string>();
@@ -27,18 +38,37 @@ namespace ImageSorterer
 
         private int n = 0;
 
-
+        private string version = "1.0.0";
+        
         private void sourceBtn_Click(object sender, EventArgs e)
         {
             DialogResult result = sourceFolder.ShowDialog();
-            if (result == DialogResult.OK)
+            bool isEmpty = !Directory.EnumerateFiles(sourceFolder.SelectedPath).Any();
+            if (result == DialogResult.OK & !isEmpty)
             {
                 var sourceLoc = sourceFolder.SelectedPath;
                 files = Directory.GetFiles(sourceFolder.SelectedPath);
                 subfolders = Directory.GetDirectories(sourceFolder.SelectedPath);
                 folderList.Items.AddRange(subfolders);
                 pictureBox1.Load(files[n]);
+                PicResize();
             }
+            else
+            {
+                MessageBox.Show("Folder does not contain any files.");
+            }
+        }
+
+        private void PicResize()
+        {
+            if (pictureBox1.Width < pictureBox1.Image.Width && pictureBox1.Height < pictureBox1.Image.Height)
+            {
+                pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            }
+            else
+            {
+                pictureBox1.SizeMode = PictureBoxSizeMode.Normal;
+            }           
         }
 
         private void moveBTN_Click(object sender, EventArgs e)
@@ -55,9 +85,10 @@ namespace ImageSorterer
             }
             movingDict.Add(files[n], destination);
             n++;
+            PicResize();
             if (n < files.Length)
             {
-                pictureBox1.Load(files[n]);
+                pictureBox1.Load(files[n]);               
             }
             else
             {
